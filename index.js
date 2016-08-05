@@ -169,11 +169,11 @@ function bindSocketHandlers() {
   });
 
   socket.on('user joined room', function(data){
-    console.log((users[userid].username + ' Joined "'+data.room'"').yellow);
+    console.log((users[data.userid].username + ' Joined "'+data.room+'"').yellow);
   });
 
   socket.on('user left room', function(data){
-    console.log((users[userid].username + ' Left "'+data.room'"').yellow);
+    console.log((users[data.userid].username + ' Left "'+data.room+'"').yellow);
   });
 
   // When a message is received
