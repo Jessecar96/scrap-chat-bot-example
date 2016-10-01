@@ -230,7 +230,9 @@ function sendAction(message, room) {
 
 // Join a room
 function joinRoom(room) {
-  socket.emit('join room', room);
+  socket.emit('join room', {
+    room: room
+  });
 }
 
 
