@@ -161,30 +161,35 @@ function bindSocketHandlers() {
   // User connected to chat
   socket.on('user joined', function(data){
     var user = data.user ? data.user : users[data.userid];
+    if (!user || !user.username) return;
     console.log((user.username + ' Joined Chat').yellow);
   });
 
   // User disconnected from chat
   socket.on('user left', function(data){
     var user = data.user ? data.user : users[data.userid];
+    if (!user || !user.username) return;
     console.log((user.username + ' Left Chat').yellow);
   });
 
   // User timed out from chat
   socket.on('user timeout', function(data){
     var user = data.user ? data.user : users[data.userid];
+    if (!user || !user.username) return;
     console.log((user.username + ' Timed Out').yellow);
   });
 
   // User joined a room
   socket.on('user joined room', function(data){
     var user = data.user ? data.user : users[data.userid];
+    if (!user || !user.username) return;
     console.log((user.username + ' Joined "'+data.room+'"').yellow);
   });
 
   // User left a room
   socket.on('user left room', function(data){
     var user = data.user ? data.user : users[data.userid];
+    if (!user || !user.username) return;
     console.log((user.username + ' Left "'+data.room+'"').yellow);
   });
 
@@ -196,6 +201,11 @@ function bindSocketHandlers() {
     var isAction = data.action;
     var isRecalled = data.recalled;
     var time = moment().format('LTS');
+
+    // Check for empty user/username
+    if (!user || !user.username) {
+      return;
+    }
 
     // isRecalled means this message was before sent we joined
     // we want to just ignore any of these
