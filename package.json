@@ -7,19 +7,16 @@
     "colors": "^1.1.2",
     "moment": "^2.14.1",
     "request": "^2.74.0",
-    "socket.io-client": "^1.4.8",
+    "socket.io-client": "^2.0.3",
     "save": "^2.3.0"
   },
   "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Jessecar96/scrap-chat-bot-example.git"
   },
   "author": "Jesse Cardone",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/Jessecar96/scrap-chat-bot-example/issues"
   },

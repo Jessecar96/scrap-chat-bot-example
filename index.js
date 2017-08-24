@@ -71,15 +71,17 @@ function bindSocketHandlers() {
     console.log('Connected to chat'.green);
   });
 
+  // When we disconnect
   socket.on('disconnect', function(){
     console.log('Disconnected'.red);
   });
 
+  // Sent when there is a reason for disconnection (kick, etc)
   socket.on('disconnect reason', function(reason){
     console.log('Disconnect Reason: '.red + reason);
   });
 
-  // Once the user's profile is loaded and you can do things
+  // This event is sent when chat we are fully connected and ready to join rooms
   socket.on('user loaded', function() {
     console.log('User loaded, ready to join rooms'.green);
     joinRoom('home');
@@ -139,7 +141,7 @@ function bindSocketHandlers() {
     };
   });
 
-  // Sent when a room changes
+  // Sent when a room changes (new motd, nsfw, etc)
   socket.on('room update', function(data) {
     var room = data.room;
     rooms[room] = {
@@ -156,40 +158,57 @@ function bindSocketHandlers() {
     delete inRooms[inRooms.indexOf(room)];
   });
 
-  socket.on('user joined', function(userid){
-    console.log((users[userid].username + ' Joined Chat').yellow);
+  // User connected to chat
+  socket.on('user joined', function(data){
+    var user = data.user ? data.user : users[data.userid];
+    console.log((user.username + ' Joined Chat').yellow);
   });
 
-  socket.on('user left', function(userid){
-    console.log((users[userid].username + ' Left Chat').yellow);
+  // User disconnected from chat
+  socket.on('user left', function(data){
+    var user = data.user ? data.user : users[data.userid];
+    console.log((user.username + ' Left Chat').yellow);
   });
 
-  socket.on('user timeout', function(userid){
-    console.log((users[userid].username + ' Timed Out').yellow);
+  // User timed out from chat
+  socket.on('user timeout', function(data){
+    var user = data.user ? data.user : users[data.userid];
+    console.log((user.username + ' Timed Out').yellow);
   });
 
+  // User joined a room
   socket.on('user joined room', function(data){
-    console.log((users[data.userid].username + ' Joined "'+data.room+'"').yellow);
+    var user = data.user ? data.user : users[data.userid];
+    console.log((user.username + ' Joined "'+data.room+'"').yellow);
   });
 
+  // User left a room
   socket.on('user left room', function(data){
-    console.log((users[data.userid].username + ' Left "'+data.room+'"').yellow);
+    var user = data.user ? data.user : users[data.userid];
+    console.log((user.username + ' Left "'+data.room+'"').yellow);
   });
 
   // When a message is received
   socket.on('message', function(data){
-    var user = users[data.userid];
+    var user = data.user ? data.user : users[data.userid];
     var room = data.room;
     var message = data.message;
     var isAction = data.action;
+    var isRecalled = data.recalled;
     var time = moment().format('LTS');
+
+    // isRecalled means this message was before sent we joined
+    // we want to just ignore any of these
+    if (isRecalled) {
+      return;
+    }
     
+    // Log messages to the console
     if (isAction) {
       console.log('['+time+']'.grey + (' ['+room+'] ').yellow + user.username.cyan + ' ' + message);
     } else {
       console.log('['+time+']'.grey + (' ['+room+'] ').yellow + user.username.cyan + ': ' + message);
     }
-    
 
     // This is where you react to user messages
     if (room == 'home') {
@@ -204,13 +223,12 @@ function bindSocketHandlers() {
 
   });
 
+  // Server messages
   socket.on('server', function(msg){
     console.log('Server: '.red + msg);
   });
 
 }
-
-// Other chat functions, etc
 
 // Send normal messages
 function sendMessage(message, room) {
@@ -231,7 +249,9 @@ function sendAction(message, room) {
 // Join a room
 function joinRoom(room) {
   socket.emit('join room', {
-    room: room
+    room: room,
+    lastMessageId: 0, // last message id we recieved, 0 = no messages recieved yet
+    recallLimit: 1 // how many recalled messages we want
   });
 }
 
@@ -245,11 +265,4 @@ function saveConfig() {
     }
     console.log('Saved config.json');
   }); 
-}
-
-function guidGenerator() {
-  var S4 = function() {
-    return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
-  };
-  return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
 }
