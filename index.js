@@ -31,11 +31,11 @@ if (!config.token) {
 // This is used to change the short key from scrap.tf/devices into a token to connect to the socket
 // We are responsible for saving the token this sends back
 function getToken() {
-  request.post('https://chat.scrap.tf/auth', {
+  request.post('https://dev.scrap.tf/api/user/login.php', {
     form: {
       key: config.key,
-      id: config.client_id, 
-      client: config.client_name
+      client_id: config.client_id, 
+      client_name: config.client_name
     }, 
     json: true
   }, function(err, response, body) {
