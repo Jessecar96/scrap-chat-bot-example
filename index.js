@@ -109,14 +109,13 @@ function bindSocketHandlers() {
 
   // This is mostly when a user updates their profile or joins in more places
   socket.on('users update', function(data){
+    if (!users || !users[data.id]) return;
     var old = users[data.id];
-    if (old) {
-      if (old.username != data.user.username || old.color != data.user.color || old.group != data.user.group) {
-        // User has changed their username
-      }
-      if (old.avatar != data.user.avatar) {
-        // User has changed their avatar
-      }
+    if (old.username != data.user.username || old.color != data.user.color || old.group != data.user.group) {
+      // User has changed their username
+    }
+    if (old.avatar != data.user.avatar) {
+      // User has changed their avatar
     }
     users[data.id] = data.user;
   });
