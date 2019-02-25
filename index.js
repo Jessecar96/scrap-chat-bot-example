@@ -107,12 +107,18 @@ function bindSocketHandlers() {
     }
   });
 
-  // This is mostly when a user updates their profile or joins in more places
+  // This is mostly when a user updates their profile or joins chat after 'users'
   socket.on('users update', function(data){
-    if (!users || !users[data.id]) return;
+    if (!users) return;
+    if (!users[data.id]) { // If the user joins after 'users' event fires, add them to users
+      users[data.id] = data.user;
+      return;
+    }
+    
     var old = users[data.id];
     if (old.username != data.user.username || old.color != data.user.color || old.group != data.user.group) {
       // User has changed their username
+      console.log((old.username + ' is now ' + data.user.username).yellow);
     }
     if (old.avatar != data.user.avatar) {
       // User has changed their avatar
